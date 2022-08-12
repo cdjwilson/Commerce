@@ -1,0 +1,53 @@
+{% extends "auctions/layout.html" %}
+
+{% block nav %}
+    {% if user.is_authenticated %}
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'create' %}">Create New listing</a>
+        </li>
+        <li>
+            <a class="nav-link" href="{% url 'watchlist' %}">Watchlist</a>
+        </li>
+        <li>
+            <a class="nav-link" href="{% url 'categories' %}">Categories</a>
+        </li>
+    {% endif %}
+{% endblock %}
+
+{% block body %}
+    <h2>Active Listings</h2>
+
+    {% for listing in listings %}
+        {% if not listing.ended %}
+        <a href="{% url 'listing' listing.id %}" class="listingLink">
+            <div class="listingItem">
+                <div class="listingImage">
+                    <img src="media/{{ listing.image }}">
+                </div>
+                <div class="listingItemDescription">
+                    <div class="listingItemTitle">
+                        <h3>{{ listing.title }}</h3>
+                    </div>
+                    {% if listing.highest_bid %}
+                    <div>
+                        <p><strong>Highest Bid: ${{ listing.highest_bid.bid }}</strong></p>
+                    </div>
+                    {% else %}
+                        <p><strong>Starting Bid: ${{ listing.price }}</strong></p>
+                    {% endif %}
+                    <div>
+                        <p>Lister: {{ listing.user }}</p>
+                    </div>
+                    <div>
+                        <p>Created: {{ listing.date }}</p>
+                    </div>
+                </div>
+            </div>
+        </a>
+        {% endif %}
+    {% empty %}
+    <div>
+        <p>No active listing</p>
+    </div>
+    {% endfor %}
+{% endblock %}

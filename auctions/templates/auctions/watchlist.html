@@ -1,0 +1,48 @@
+{% extends "auctions/layout.html" %}
+
+{% block nav %}
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'index' %}">Active Listings</a>
+    </li>
+    
+    {% if user.is_authenticated %}
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'create' %}">Create New listing</a>
+        </li>
+    {% endif %}
+    <li>
+        <a class="nav-link" href="{% url 'categories' %}">Categories</a>
+    </li>
+{% endblock %}
+
+{% block body %}
+    <h2>Watchlist</h2>
+
+    {% for listing in watchlist %}
+        <a href="{% url 'listing' listing.listingWatchlist.id %}" class="listingLink">
+            <div class="listingItem">
+                <div class="listingImage">
+                    <img src="media/{{ listing.listingWatchlist.image }}">
+                </div>
+                <div class="listingItemDescription">
+                    <div class="listingItemTitle">
+                        <h3>{{ listing.listingWatchlist.title }}</h3>
+                    </div>
+                    <div>
+                        <p><strong>Price: ${{ listing.listingWatchlist.price }}</strong></p>
+                    </div>
+                    <div>
+                        <p>Lister: {{ listing.listingWatchlist.user }}</p>
+                    </div>
+                    <div>
+                        <p>Created: {{ listing.listingWatchlist.date }}</p>
+                    </div>
+                </div>
+            </div>
+        </a>
+    {% empty %}
+    <div>
+        <p>No Listings in Watchlist</p>
+    </div>
+    {% endfor %}
+{% endblock %}

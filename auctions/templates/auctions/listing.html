@@ -1,0 +1,128 @@
+{% extends "auctions/layout.html" %}
+
+{% block nav %}
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'index' %}">Active Listings</a>
+    </li>
+    <li>
+        <a class="nav-link" href="{% url 'watchlist' %}">Watchlist</a>
+    </li>
+    <li>
+        <a class="nav-link" href="{% url 'categories' %}">Categories</a>
+    </li>
+{% endblock %}
+
+{% block body %}
+{% if listing.ended %}
+    <h2>Auction for {{ listing.title }} has ended</h2>
+{% endif %}
+<div class="listing">
+    <div class="listingImageDescription">
+        <div class="listingItemImage">
+            <img src="{{ listing.image.url }}">
+            {% if user.is_authenticated %}
+                {% if not watchlist%}
+                    <button type="submit" style="position: absolute; top: 0px; left: 0px; font-size: 14px;"> <a href="{% url 'addWatchlist' listing.id %}">Add to Watchlist</a></button>
+                {% else %}
+                    <button type="submit" style="position: absolute; top: 0px; left: 0px; font-size: 14px;"> <a href="{% url 'removeWatchlist' listing.id %}">Remove from Watchlist</a></button>
+                {% endif %}
+            {% endif %}
+        </div>
+        <div class="lid">
+            <div class="deleteListing">
+                <div>
+                    <h1 class="title">{{ listing.title }}</h1>
+                </div>
+                <div class="deleteListingForm">
+                    {% if listing.user == user %}
+                        <form action="{% url 'deleteListing' listing.id %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="deleteButton">Delete</button>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+            <div>
+                <p class="info">Lister: {{ listing.user }}</p>
+            </div>
+            <div>
+                <p class="info">Created: {{ listing.date }}</p>
+            </div>
+            <div>
+                <p class="description">{{ listing.description }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="listingItemDescription1">
+        <div>
+            {% if listing.category != None %}
+                <h4>Category: <a href="{% url 'categoryList' listing.category %}">{{ listing.category }}</a></h4>
+            {% elif user == listing.user %}
+                <h4>Category: <a href="{% url 'addCategory' listing.id %}">Add Category</a></h4>
+            {% else %}
+                <h4>Category: No Category Listed</h4>
+            {% endif %}
+        </div>
+        <div class="listingItemTitle">
+            <h3>Starting Bid: ${{ listing.price }}</h3>
+        </div>
+        <div>
+            {% if not listing.highest_bid %}
+                <h3>Top Bid: None</h3>
+            {% else %}
+                <h3>Top Bid: ${{ listing.highest_bid.bid }}</h3>
+            {% endif %}
+        </div>
+        <div>
+            <p>Bidder: {{ listing.highest_bid.user }}</p>
+        </div>
+        {% if user == listing.user and listing.highest_bid and not listing.ended %}
+            <form action="{% url 'endListing' listing.id %}" method="post">
+                {% csrf_token %}
+                <input type="submit" value="Accept Highest Bid">
+            </form>
+        {% elif user != listing.user and not listing.ended %}
+            <form action="{% url 'bid' listing.id %}" method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <input type="submit" value="Place Bid">
+            </form>
+        {% endif %}
+    </div>
+</div>
+<div class="comments">
+    <h2>Write a Comment: </h2>
+    <form action="{% url 'comment' listing.id %}" method="post">
+        {% csrf_token %}
+        <textarea class="commentTextarea" name="comment"></textarea>
+        <br>
+        <input type="submit" value="Post Comment">
+    </form>
+    {% if comments %}
+    <div>
+        <h2>Comments: </h2>
+        {% for comment in comments %}
+        <div class="comment">
+            <div class="commentUser">
+                <div>
+                    <h3>{{comment.user}}</h3>
+                </div>
+                <div class="delete">
+                    {% if comment.user == user %}
+                        <form action="{% url 'deleteComment' listing.id comment.id %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="deleteButton">Delete</button>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+            <p>{{comment.comment}}</p>
+        </div>
+        <br>
+        {% empty %}
+            <div></div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

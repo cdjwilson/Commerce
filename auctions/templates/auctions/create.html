@@ -1,0 +1,22 @@
+{% extends "auctions/layout.html" %}
+
+{% block nav %}
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'index' %}">Active Listings</a>
+    </li>
+    <li>
+        <a class="nav-link" href="{% url 'watchlist' %}">Watchlist</a>
+    </li>
+    <li>
+        <a class="nav-link" href="{% url 'categories' %}">Categories</a>
+    </li>
+{% endblock %}
+
+{% block body %}
+    <h2>Create Listing</h2>
+    <form action="{% url 'create' %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" placeholder="Create New Listing">
+    </form>
+{% endblock %}

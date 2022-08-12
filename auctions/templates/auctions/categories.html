@@ -1,0 +1,26 @@
+{% extends "auctions/layout.html" %}
+
+{% block nav %}
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'index' %}">Active Listings</a>
+    </li>
+    <li>
+        <a class="nav-link" href="{% url 'watchlist' %}">Watchlist</a>
+    </li>
+    <li>
+        <a class="nav-link" href="{% url 'categories' %}">Categories</a>
+    </li>
+{% endblock %}
+
+{% block body %}
+<ul>
+    <h2>Categories:</h2>
+    {% for category in categories %}
+        {% if category != None %}
+            <li>
+                <a href="{% url 'categoryList' category %}">{{ category }}</a>
+            </li>
+        {% endif %}
+    {% endfor %}
+</ul>
+{% endblock %}
